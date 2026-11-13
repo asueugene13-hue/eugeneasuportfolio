@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://eugeneasuportfolio.vercel.app/sitemap.xml
