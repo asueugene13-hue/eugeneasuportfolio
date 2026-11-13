@@ -1,0 +1,77 @@
+.spline-scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.spline-scene__fallback,
+.spline-scene__canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.spline-scene__fallback {
+  transition: opacity 0.8s ease;
+}
+
+.spline-scene__canvas {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.spline-scene.is-loaded .spline-scene__canvas {
+  opacity: 1;
+}
+
+.spline-scene.is-loaded .spline-scene__fallback {
+  opacity: 0;
+}
+
+.spline-scene__canvas > div,
+.spline-scene__canvas canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  outline: none;
+}
+
+.spline-scene__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.spline-scene__label {
+  font-size: 0.875rem;
+  color: var(--text-2);
+}
+
+.spline-scene__spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-top-color: var(--blue);
+  animation: spin 0.9s linear infinite;
+}
+
+/* Touch devices: vertical swipes scroll the page instead of being trapped by the canvas */
+@media (pointer: coarse) {
+  .spline-scene__canvas canvas {
+    touch-action: pan-y;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spline-scene__canvas,
+  .spline-scene__fallback {
+    transition: none;
+  }
+}

@@ -1,0 +1,416 @@
+.hero {
+  --px: 0;
+  --py: 0;
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: calc(var(--nav-h) + 40px) 0 120px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* ── Background layers ── */
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.hero__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 70% at 60% 40%, #000 20%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 60% 40%, #000 20%, transparent 75%);
+}
+
+.hero__glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  transition: transform 1.2s var(--ease);
+}
+
+.hero__glow--blue {
+  width: 46vw;
+  height: 46vw;
+  max-width: 640px;
+  max-height: 640px;
+  top: 6%;
+  right: 4%;
+  background: rgba(79, 140, 255, 0.16);
+  transform: translate(calc(var(--px) * -30px), calc(var(--py) * -24px));
+}
+
+.hero__glow--purple {
+  width: 36vw;
+  height: 36vw;
+  max-width: 520px;
+  max-height: 520px;
+  bottom: -8%;
+  right: 26%;
+  background: rgba(139, 92, 246, 0.14);
+  transform: translate(calc(var(--px) * 24px), calc(var(--py) * 20px));
+}
+
+/* bottom fade so the hero blends into the next section */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 160px;
+  z-index: -1;
+  background: linear-gradient(transparent, var(--bg));
+  pointer-events: none;
+}
+
+/* ── 3D visual (Spline or canvas globe) ── */
+.hero__visual {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+  right: -4%;
+  width: min(60vw, 920px);
+  mask-image: radial-gradient(closest-side, #000 62%, transparent 100%);
+  -webkit-mask-image: radial-gradient(closest-side, #000 62%, transparent 100%);
+  translate: calc(var(--px) * -10px) calc(var(--py) * -8px);
+  transition: translate 1s var(--ease);
+  opacity: 0;
+  animation: visual-in 1.6s var(--ease) 0.2s forwards;
+}
+
+.hero-globe {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes visual-in {
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── Content ── */
+.hero__content {
+  position: relative;
+}
+
+.hero__content > * {
+  max-width: 660px;
+}
+
+.hero__kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--blue-soft);
+}
+
+.hero__kicker-line {
+  width: 36px;
+  height: 1px;
+  background: var(--grad);
+}
+
+.hero__title {
+  max-width: none !important;
+  font-size: clamp(3.1rem, 11.5vw, 8.6rem);
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.05em;
+  margin-bottom: 26px;
+}
+
+.hero__word {
+  display: block;
+  white-space: nowrap;
+}
+
+.hero__char {
+  display: inline-block;
+}
+
+/* ── 3D name ──
+   The whole title tilts toward the cursor (--px/--py are set on .hero),
+   and every letter gets an extruded side built from a stacked text-shadow
+   on a copy of the glyph behind it. The extrusion direction follows the
+   cursor too, so the depth reads as real perspective. */
+.hero__title {
+  --ex: calc(0.9px - var(--px, 0) * 0.7px);
+  --ey: calc(1.1px - var(--py, 0) * 0.7px);
+  isolation: isolate;
+  transform: perspective(1100px) rotateX(calc(var(--py, 0) * -7deg)) rotateY(calc(var(--px, 0) * 9deg));
+  transform-origin: 30% 50%;
+  transition: transform 0.5s var(--ease);
+}
+
+.hero__char {
+  position: relative;
+  transition: translate 0.45s var(--ease);
+}
+
+/* the real glyph only holds the space; the two layers below draw it */
+.hero__char {
+  color: transparent;
+}
+
+/* front face (top layer): white with a cool light falling from the top */
+.hero__char::after {
+  content: attr(data-c);
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, #ffffff 30%, #c9d6ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  pointer-events: none;
+}
+
+.hero__char::before {
+  content: attr(data-c);
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  color: #1b2150;
+  -webkit-text-fill-color: #1b2150;
+  background: none;
+  text-shadow:
+    calc(var(--ex) * 1) calc(var(--ey) * 1) 0 #1e2558,
+    calc(var(--ex) * 2) calc(var(--ey) * 2) 0 #1d2354,
+    calc(var(--ex) * 3) calc(var(--ey) * 3) 0 #1c214f,
+    calc(var(--ex) * 4) calc(var(--ey) * 4) 0 #1a1f4a,
+    calc(var(--ex) * 5) calc(var(--ey) * 5) 0 #191d45,
+    calc(var(--ex) * 6) calc(var(--ey) * 6) 0 #171b40,
+    calc(var(--ex) * 7) calc(var(--ey) * 7) 0 #16193b,
+    calc(var(--ex) * 8) calc(var(--ey) * 8) 0 #141736,
+    calc(var(--ex) * 9) calc(var(--ey) * 9) 0 #121431,
+    calc(var(--ex) * 10) calc(var(--ey) * 10) 0 #10122c,
+    calc(var(--ex) * 12) calc(var(--ey) * 16) 28px rgba(0, 0, 0, 0.65),
+    0 0 46px rgba(79, 140, 255, 0.28);
+  pointer-events: none;
+}
+
+.hero__word--accent .hero__char::before {
+  color: #2a1f63;
+  -webkit-text-fill-color: #2a1f63;
+  text-shadow:
+    calc(var(--ex) * 1) calc(var(--ey) * 1) 0 #2c2168,
+    calc(var(--ex) * 2) calc(var(--ey) * 2) 0 #2a1f62,
+    calc(var(--ex) * 3) calc(var(--ey) * 3) 0 #271d5b,
+    calc(var(--ex) * 4) calc(var(--ey) * 4) 0 #241b54,
+    calc(var(--ex) * 5) calc(var(--ey) * 5) 0 #21194d,
+    calc(var(--ex) * 6) calc(var(--ey) * 6) 0 #1e1746,
+    calc(var(--ex) * 7) calc(var(--ey) * 7) 0 #1b153f,
+    calc(var(--ex) * 8) calc(var(--ey) * 8) 0 #181338,
+    calc(var(--ex) * 9) calc(var(--ey) * 9) 0 #151131,
+    calc(var(--ex) * 10) calc(var(--ey) * 10) 0 #120f2b,
+    calc(var(--ex) * 12) calc(var(--ey) * 16) 28px rgba(0, 0, 0, 0.65),
+    0 0 52px rgba(139, 92, 246, 0.35);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hero__char:hover {
+    translate: 0 -0.07em;
+    transition-duration: 0.2s;
+  }
+}
+
+.hero__word--accent .hero__char::after {
+  /* each letter shows its slice of one continuous gradient */
+  background: linear-gradient(100deg, #8fb4ff 0%, #6d8cff 40%, #a78bfa 75%, #c4b5fd 100%);
+  background-size: calc(var(--n) * 100%) 100%;
+  background-position: calc(var(--j) / (var(--n) - 1) * 100%) 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero__subtitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  margin-bottom: 18px;
+}
+
+.hero__desc {
+  color: var(--text-2);
+  font-size: clamp(1rem, 1.4vw, 1.08rem);
+  max-width: 560px !important;
+  margin-bottom: 36px;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+/* ── Entrance animations (start after the loading screen) ── */
+.hero__char {
+  opacity: 0;
+  transform: translateY(0.5em) rotate(6deg);
+  filter: blur(10px);
+}
+
+.hero-in {
+  opacity: 0;
+}
+
+.is-ready .hero__char {
+  animation: char-in 0.95s var(--ease) forwards;
+  animation-delay: calc(120ms + var(--i) * 42ms);
+}
+
+.is-ready .hero-in {
+  animation: fade-up 0.9s var(--ease) forwards;
+  animation-delay: var(--d, 0ms);
+}
+
+@keyframes char-in {
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+/* ── Scroll indicator ── */
+.scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+.scroll-cue:hover {
+  color: var(--text);
+}
+
+.scroll-cue__mouse {
+  width: 24px;
+  height: 38px;
+  border-radius: 14px;
+  border: 1.5px solid var(--border-strong);
+  display: flex;
+  justify-content: center;
+  padding-top: 7px;
+}
+
+.scroll-cue__wheel {
+  width: 3px;
+  height: 8px;
+  border-radius: 3px;
+  background: var(--grad);
+  animation: wheel 1.8s var(--ease) infinite;
+}
+
+@keyframes wheel {
+  0% {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .hero {
+    align-items: flex-end;
+    padding-bottom: 110px;
+  }
+  .hero__visual {
+    top: calc(var(--nav-h) - 20px);
+    bottom: auto;
+    left: 50%;
+    right: auto;
+    width: 125vw;
+    height: 70svh;
+    translate: -50% 0;
+    transition: none;
+  }
+  .hero__visual {
+    animation-name: visual-in-mobile;
+  }
+  /* soften the visual behind text on small screens */
+  @keyframes visual-in-mobile {
+    to {
+      opacity: 0.6;
+    }
+  }
+  .hero__glow--blue {
+    width: 90vw;
+    height: 90vw;
+    right: -20%;
+  }
+  .hero__glow--purple {
+    width: 70vw;
+    height: 70vw;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero__actions .btn {
+    flex: 1 1 100%;
+  }
+  .scroll-cue__label {
+    display: none;
+  }
+}
+
+@media (max-height: 640px) and (min-width: 901px) {
+  .scroll-cue {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__char,
+  .hero-in,
+  .hero__visual,
+  .hero__title {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+  .hero__title {
+    --ex: 0.9px;
+    --ey: 1.1px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (max-width: 900px) {
+  .hero__visual {
+    opacity: 0.6;
+  }
+}
